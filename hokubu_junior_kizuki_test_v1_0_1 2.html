@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>北部ジュニア きづき｜テスト運用版 v1.0.1</title>
+<style>
+:root{
+  --bg:#f6f8fc;--card:#fff;--ink:#172033;--muted:#667085;--line:#e4e7ec;
+  --accent:#2457d6;--good:#16794b;--bad:#b42318;--orange:#b54708;--soft:#eef4ff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}
+.brand{max-width:840px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}
+main{max-width:840px;margin:auto;padding:16px 14px 104px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(16,24,40,.04)}
+.hero{background:linear-gradient(135deg,#eef4ff,#fff)}
+h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:0 0 8px}p{line-height:1.6}.muted{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.bigbtn,.btn{border:0;border-radius:15px;padding:14px 12px;font-weight:800;font-size:16px;cursor:pointer}
+.bigbtn{background:var(--soft);color:#173d9a;min-height:86px}.btn{background:#eef1f6;color:var(--ink)}
+.btn.primary{background:var(--accent);color:#fff}.btn.good{background:#e9f7ef;color:var(--good)}.btn.bad{background:#feeceb;color:var(--bad)}
+.btn.orange{background:#fff3e8;color:var(--orange)}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.btnrow .btn{flex:1;min-width:120px}
+.rolebar{display:flex;gap:8px;overflow:auto;padding-bottom:2px}.rolebar button{white-space:nowrap}
+.rolebar .active{background:var(--accent);color:white}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
+input,select,textarea{width:100%;font:inherit;border:1px solid #cfd4dc;border-radius:12px;padding:12px;background:#fff;color:var(--ink)}
+textarea{min-height:86px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hide{display:none!important}
+.playerList,.attendanceGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.player,.attend{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:left;font-weight:800}
+.attend.present{background:#e9f7ef;border-color:#7bc49b;color:#146c43}.attend .state{font-size:12px;font-weight:600;color:var(--muted)}
+.statline{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f8fafc;border-radius:14px;padding:12px;text-align:center}.stat b{display:block;font-size:22px}
+.item{border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0;background:#fff}
+.item .top{display:flex;justify-content:space-between;gap:8px;align-items:center}.tag{font-size:12px;border-radius:999px;padding:4px 8px;background:#f2f4f7;color:#475467;display:inline-block}
+.win{color:var(--good);font-weight:800}.loss{color:var(--bad);font-weight:800}
+.voicebox{background:#fff8ed;border:1px solid #fedf89;border-radius:16px;padding:14px;margin:12px 0}.voicePreview{font-size:18px;font-weight:800;margin:8px 0}
+.notice{font-size:13px;background:#fff7e6;border-radius:12px;padding:10px;color:#7a4d00}.countBadge{display:inline-block;background:#e9f7ef;color:#146c43;border-radius:999px;padding:4px 9px;font-weight:800;font-size:13px}
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.98);border-top:1px solid var(--line);padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));display:flex;gap:5px;z-index:10}
+nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px 2px;font-size:12px;color:#475467}nav button.active{background:var(--soft);color:#173d9a;font-weight:800}
+@media(max-width:560px){.two{grid-template-columns:1fr}.brand small{display:none}}
+
+.authbox{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px}
+.syncdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#98a2b3;margin-right:6px}
+.syncdot.on{background:#12b76a}.syncdot.err{background:#f04438}
+
+.audit{font-size:12px;color:var(--muted);border-left:3px solid #d0d5dd;padding-left:10px;margin:8px 0}
+
+.bulkbox{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;min-height:120px}
+.invite{border:2px solid var(--line);border-radius:16px;padding:14px;margin:10px 0;background:#fff}
+.invite h4{margin:0 0 8px}.codebig{font-size:28px;font-weight:900;letter-spacing:2px}
+.qrbox{width:150px;height:150px;border:1px dashed #98a2b3;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--muted);padding:8px;background:#fff}
+@media print{header,nav,.noprint{display:none!important}body{background:#fff}.invite{break-inside:avoid}}
+
+.testbanner{background:#ecfdf3;border:1px solid #abefc6;border-radius:16px;padding:12px 14px;margin-bottom:14px;color:#067647}
+.testbanner b{display:block;margin-bottom:3px}
+.feedback{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>🏸 北部ジュニア きづき</h1>
+    <small>テスト運用版 v1.0.1</small>
+  </div>
+</header>
+
+<main>
+<div class="testbanner">
+  <b>🧪 北部ジュニア きづき｜テスト運用版 v1.0.1</b>
+  数名で実際に使い、出席・結果入力・気づき・保護者閲覧を確認します。v1.0.1では音声入力のエラー表示と文字入力フォールバックを改善しました。
+</div>
+<section id="home">
+  <div class="card">
+    <h3>使う人</h3>
+    <div class="rolebar">
+      <button class="btn active" data-role="チーム" onclick="setRole('チーム',this)">チームiPad</button>
+      <button class="btn" data-role="指導者" onclick="setRole('指導者',this)">指導者</button>
+      <button class="btn" data-role="保護者" onclick="setRole('保護者',this)">保護者</button>
+      <button class="btn" data-role="選手" onclick="setRole('選手',this)">選手</button>
+    </div>
+  </div>
+
+  <div class="card" id="accessCard">
+    <h3>🔐 利用者設定</h3>
+    <p class="muted">チームiPadは共用、指導者は全選手、保護者・選手は自分の登録情報だけを見る想定です。</p>
+    <div id="identityBox"></div>
+  </div>
+
+  <div class="card hero">
+    <h2>今日の練習</h2>
+    <p class="muted"><span id="todayLabel"></span>　参加 <span id="homeAttendCount" class="countBadge">0人</span></p>
+    <div class="grid" id="homeActions"></div>
+  </div>
+
+  <div class="card">
+    <h3>✅ 今日のテストで確認すること</h3>
+    <p class="muted">① 子どもが自分で出席できる　② 音声で結果を登録できる　③ 2人のカルテへ反映される　④ 指導者が気づきを残せる　⑤ 保護者が自分の子だけ見られる</p>
+  </div>
+  <div class="card">
+    <h3>今日参加している選手</h3>
+    <div id="homePresent" class="muted">まだ出席入力がありません。</div>
+  </div>
+</section>
+
+<section id="attendance" class="hide">
+  <div class="card">
+    <h2>🙋 今日の出席</h2>
+    <p class="muted">自分の名前を1回タップしてください。もう一度押すと取り消せます。</p>
+    <div id="attendanceGrid" class="attendanceGrid"></div>
+    <p>参加中：<span id="attendCount" class="countBadge">0人</span></p>
+  </div>
+</section>
+
+<section id="voice" class="hide">
+  <div class="card">
+    <h2>🎤 ゲーム結果を話す</h2>
+    <p class="muted">例：「山下 対 中山、2対0で山下」</p>
+    <button id="voiceBtn" class="btn orange" style="width:100%" onclick="startVoice()">🎤 マイクを押して話す</button>
+    <div class="voicebox">
+      <div id="voiceEnv" class="muted"></div>
+      <div id="voiceRaw" class="muted">認識した言葉がここに表示されます。</div>
+      <div id="voicePreview" class="voicePreview">結果待ち</div>
+      <div id="voiceActions" class="btnrow hide">
+        <button class="btn primary" onclick="confirmVoiceResult()">✅ この内容で登録</button>
+        <button class="btn" onclick="clearVoice()">やり直す</button>
+      </div>
+    </div>
+    <div class="card" style="margin:12px 0 0;padding:12px;background:#f8fafc">
+      <h3>⌨️ 音声が使えないとき</h3>
+      <p class="muted">同じ内容を文字で入力して「読み取る」を押せます。</p>
+      <input id="voiceManual" placeholder="山下対中山、2対0で山下">
+      <button class="btn" style="width:100%;margin-top:8px" onclick="parseManualVoice()">文字を読み取る</button>
+    </div>
+    <p class="notice">音声認識は、HTTPSで公開したWebページをSafari/Chromeから開くと安定しやすいです。ダウンロードしたHTMLを直接開いた場合は制限されることがあります。</p>
+  </div>
+</section>
+
+<section id="notice" class="hide">
+  <div class="card">
+    <h2>💡 気づきを残す</h2>
+    <label>選手</label><select id="nPlayer"></select>
+    <label>気づいた人</label><select id="nAuthor"><option>指導者</option><option>保護者</option><option>本人</option></select>
+    <label>種類</label><select id="nKind"><option>技術</option><option>フットワーク</option><option>気持ち</option><option>声かけ・ペア</option><option>体力</option><option>生活・自主練</option><option>その他</option></select>
+    <label>今日の気づき</label><textarea id="nText" placeholder="例：サーブ後の構えが早くなった。最後まで声が出ていた。"></textarea>
+    <label>次に意識すること</label><textarea id="nNext" placeholder="例：レシーブのあと一歩前へ。"></textarea>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveNotice()">保存する</button>
+  </div>
+</section>
+
+<section id="reflection" class="hide">
+  <div class="card">
+    <h2>😊 本人の振り返り</h2>
+    <label>選手</label><select id="fPlayer"></select>
+    <label>今日できたこと</label><textarea id="fGood" placeholder="例：最後まであきらめなかった"></textarea>
+    <label>次にやってみたいこと</label><textarea id="fNext" placeholder="例：サーブをもっと低くする"></textarea>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveReflection()">保存する</button>
+  </div>
+</section>
+
+<section id="record" class="hide">
+  <div class="card">
+    <h2 id="recordTitle">結果を入力</h2>
+    <label>選手</label><select id="rPlayer"></select>
+    <div class="two">
+      <div><label>日付</label><input id="rDate" type="date"></div>
+      <div><label>種目</label><select id="rEvent"><option>シングルス</option><option>ダブルス</option></select></div>
+    </div>
+    <label>大会名・練習名</label><input id="rName">
+    <label>対戦相手</label><input id="rOpponent">
+    <div class="two">
+      <div><label>自分のゲーム数</label><input id="rFor" type="number" min="0" placeholder="2"></div>
+      <div><label>相手のゲーム数</label><input id="rAgainst" type="number" min="0" placeholder="0"></div>
+    </div>
+    <label>勝敗</label>
+    <div class="btnrow">
+      <button class="btn good" onclick="setResult('勝利')">○ 勝利</button>
+      <button class="btn bad" onclick="setResult('敗戦')">● 敗戦</button>
+    </div>
+    <input id="rResult" type="hidden">
+    <label>気づき</label><textarea id="rNote"></textarea>
+    <label>次に意識すること</label><textarea id="rNext"></textarea>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveRecord()">記録する</button>
+  </div>
+</section>
+
+<section id="players" class="hide">
+  <div class="card">
+    <h2>👤 選手</h2>
+    <div class="playerList" id="playerList"></div>
+    <label>新しい選手を追加</label>
+    <div class="btnrow"><input id="newPlayer" placeholder="選手名"><button class="btn primary" onclick="addPlayer()">追加</button></div>
+  </div>
+</section>
+
+<section id="profile" class="hide">
+  <div class="card">
+    <h2 id="pName">選手カルテ</h2>
+    <div class="statline">
+      <div class="stat"><b id="pMatches">0</b><span>試合</span></div>
+      <div class="stat"><b id="pWins">0</b><span>勝</span></div>
+      <div class="stat"><b id="pNotices">0</b><span>きづき</span></div>
+    </div>
+    <div id="pHistory"></div>
+    <button class="btn" style="width:100%;margin-top:10px" onclick="showTab('players')">選手一覧へ</button>
+  </div>
+</section>
+
+<section id="feedback" class="hide">
+  <div class="card">
+    <h2>📝 テストメモ</h2>
+    <p class="muted">使いにくかったこと・間違えたこと・欲しい機能をその場で残します。</p>
+    <label>誰が使った？</label>
+    <select id="fbUser"><option>指導者</option><option>保護者</option><option>選手</option><option>チームiPad</option></select>
+    <label>内容</label>
+    <textarea id="fbText" placeholder="例：音声入力で名前を聞き間違えた／出席ボタンはもっと大きい方がいい"></textarea>
+    <button class="btn primary" style="width:100%;margin-top:10px" onclick="saveFeedback()">テストメモを保存</button>
+  </div>
+  <div class="card">
+    <h3>これまでのテストメモ</h3>
+    <div id="feedbackList"></div>
+  </div>
+</section>
+
+<section id="admin" class="hide">
+  <div class="card">
+    <h2>🛠 指導者管理</h2>
+    <p class="muted">選手登録と、保護者・選手用コードの発行を行います。</p>
+    <label>選手名</label>
+    <input id="aPlayerName" placeholder="例：山下 太郎">
+    <div class="btnrow" style="margin-top:10px">
+      <button class="btn primary" onclick="adminAddPlayer()">選手を登録</button>
+      <button class="btn" onclick="renderAdmin()">一覧を更新</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📥 名簿をまとめて登録</h3>
+    <p class="muted">1行に1人ずつ入力します。例：山下 太郎</p>
+    <textarea id="bulkNames" class="bulkbox" placeholder="山下 太郎
+中山 花子
+田中 一郎"></textarea>
+    <button class="btn primary" style="width:100%;margin-top:10px" onclick="bulkImportPlayers()">まとめて登録</button>
+  </div>
+  <div class="card">
+    <h3>登録一覧</h3>
+    <div id="adminList"></div>
+  </div>
+  <div class="card">
+    <h3>📄 保護者向け案内</h3>
+    <p class="muted">各家庭へ渡す案内を表示します。正式公開URLを設定すると、そのURL入り案内になります。</p>
+    <label>公開予定URL</label>
+    <input id="publicAppUrl" placeholder="https://....">
+    <div class="btnrow" style="margin-top:10px">
+      <button class="btn primary" onclick="savePublicUrl()">URLを保存</button>
+      <button class="btn" onclick="renderInvites()">案内を更新</button>
+      <button class="btn" onclick="window.print()">印刷</button>
+    </div>
+    <div id="inviteList" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <h3>📋 最近の操作履歴</h3>
+    <div id="auditList"></div>
+  </div>
+</section>
+
+<section id="settings" class="hide">
+  <div class="card">
+    <h2>☁️ 共有化の準備</h2>
+    <p><b>正式版の想定：</b>チームiPad・指導者端末・保護者スマホから同じデータベースへ保存します。</p>
+    <label>Google Apps Script WebアプリURL</label>
+    <input id="cloudUrl" placeholder="https://script.google.com/macros/s/...../exec">
+    <div class="btnrow" style="margin-top:10px">
+      <button class="btn primary" onclick="saveCloudUrl()">接続先を保存</button>
+      <button class="btn" onclick="syncFromCloud()">クラウドから読み込む</button>
+    </div>
+    <p id="cloudStatus" class="muted"><span id="syncDot" class="syncdot"></span>現在：この端末内に保存</p>
+    <button class="btn good" style="width:100%;margin-top:8px" onclick="fullSync()">今すぐ同期</button>
+    <div class="item">① チームIDで北部ジュニアに接続</div>
+    <div class="item">② 指導者＝全選手を閲覧・修正</div>
+    <div class="item">③ 保護者＝登録した子だけ閲覧・入力</div>
+    <div class="item">④ 選手＝自分の出席・振り返り中心</div>
+    <p class="notice">v0.5ではGoogle Apps ScriptのURLを設定すると、記録保存時にクラウドへ送信できる構造にしています。接続先未設定時は従来どおり端末内保存です。</p>
+  </div>
+  <div class="card">
+    <h2>⚙️ データ管理</h2>
+    <p class="notice">この統合試作版は端末内保存です。次段階で複数端末共有に対応する設計へ移行します。</p>
+    <div class="btnrow">
+      <button class="btn" onclick="exportTestReport()">テスト結果を書き出す</button>
+      <button class="btn" onclick="exportData()">バックアップ</button>
+      <button class="btn bad" onclick="resetData()">リセット</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<nav>
+<button id="navHome" class="active" onclick="showTab('home')">🏠<br>ホーム</button>
+<button id="navAttendance" onclick="showTab('attendance')">🙋<br>出席</button>
+<button id="navVoice" onclick="showTab('voice')">🎤<br>結果</button>
+<button id="navPlayers" onclick="showTab('players')">👤<br>選手</button>
+<button id="navFeedback" onclick="showTab('feedback')">📝<br>メモ</button>
+<button id="navAdmin" onclick="showTab('admin')">🛠<br>登録</button>
+<button id="navSettings" onclick="showTab('settings')">⚙️<br>管理</button>
+</nav>
+
+<script>
+const KEY='hokubu_kizuki_v101';
+let db=load(), role='チーム', identity='', pendingVoice=null, recordType='ゲーム練習', loggedIn=false;
+
+function seed(){
+  return {
+    players:['山下','中山','リサ','選手A','選手B'],
+    attendance:{},
+    records:[],
+    notices:[],
+    reflections:[],
+    users:[
+      {role:'保護者',code:'1001',player:'山下'},
+      {role:'保護者',code:'1002',player:'中山'},
+      {role:'選手',code:'2001',player:'山下'},
+      {role:'選手',code:'2002',player:'中山'}
+    ],
+    audit:[],
+    feedback:[]
+  }
+}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||seed()}catch(e){return seed()}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db))}
+function getCloudUrl(){return localStorage.getItem('hokubu_kizuki_cloud_url')||''}
+function saveCloudUrl(){
+  const url=(cloudUrl.value||'').trim();
+  if(!url){localStorage.removeItem('hokubu_kizuki_cloud_url');cloudStatus.textContent='現在：この端末内に保存';alert('クラウド接続を解除しました');return}
+  localStorage.setItem('hokubu_kizuki_cloud_url',url);
+  cloudStatus.textContent='現在：クラウド接続先を設定済み';
+  alert('接続先を保存しました');
+}
+async function cloudPost(action,payload){
+  const url=getCloudUrl(); if(!url)return {ok:false,localOnly:true};
+  try{
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,payload,team:'北部ジュニア'})});
+    const data=await res.json();
+    if(cloudStatus){cloudStatus.innerHTML='<span id="syncDot" class="syncdot on"></span>最終クラウド通信：'+new Date().toLocaleTimeString('ja-JP');}
+    return data;
+  }catch(e){
+    console.warn(e); if(cloudStatus){cloudStatus.innerHTML='<span id="syncDot" class="syncdot err"></span>クラウド通信失敗：端末内には保存済み';}
+    return {ok:false,error:String(e)};
+  }
+}
+async function syncFromCloud(){
+  const url=getCloudUrl(); if(!url){alert('先にApps ScriptのURLを設定してください');return}
+  try{
+    const res=await fetch(url+'?action=export&team='+encodeURIComponent('北部ジュニア'));
+    const data=await res.json();
+    if(!data.ok)throw new Error(data.error||'読み込み失敗');
+    if(data.db){db=data.db;persist();renderHome();alert('クラウドのデータを読み込みました')}
+  }catch(e){alert('クラウドから読み込めませんでした：'+e.message)}
+}
+async function cloudSave(kind,item){return cloudPost('append',{kind,item})}
+async function cloudReplaceAll(){return cloudPost('replaceAll',{db})}
+async function fullSync(){
+  const url=getCloudUrl(); if(!url){alert('先にApps Script URLを設定してください');return}
+  await cloudReplaceAll();
+  await syncFromCloud();
+}
+
+function audit(action,detail,target=''){
+  if(!db.audit)db.audit=[];
+  db.audit.unshift({id:Date.now()+Math.random(),time:new Date().toISOString(),actor:role+(identity?'('+identity+')':''),action,detail,target});
+  persist();
+  cloudSave('audit',db.audit[0]);
+}
+
+function today(){return new Date().toISOString().slice(0,10)}
+function jpToday(){return new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(new Date())}
+function presentNames(){return db.attendance[today()]||[]}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function jsEsc(s=''){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+
+function setRole(r,el){
+  role=r; identity=''; loggedIn=false;
+  document.querySelectorAll('.rolebar button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderIdentity(); renderHomeActions();
+}
+function renderIdentity(){
+  if(role==='保護者'||role==='選手'){
+    identityBox.innerHTML=`<div class="authbox">
+      <label>${role==='保護者'?'保護者コード':'選手コード'}</label>
+      <input id="loginCode" inputmode="numeric" placeholder="4桁コード">
+      <button class="btn primary" style="width:100%;margin-top:10px" onclick="loginByCode()">ログイン</button>
+      <p class="muted">テスト用コードを指導者管理画面で確認できます</p>
+    </div>`;
+  }else if(role==='指導者'){
+    loggedIn=false;
+    identityBox.innerHTML=`<div class="authbox">
+      <label>指導者コード</label>
+      <input id="coachCode" inputmode="numeric" placeholder="試作用：9999">
+      <button class="btn primary" style="width:100%;margin-top:10px" onclick="loginCoach()">指導者ログイン</button>
+    </div>`;
+  }else{
+    loggedIn=true;
+    identityBox.innerHTML=`<span class="tag">チームiPad共用モード</span>`;
+  }
+}
+function loginByCode(){
+  const code=(loginCode.value||'').trim();
+  const u=(db.users||[]).find(x=>x.role===role&&x.code===code);
+  if(!u){alert('コードが違います');return}
+  identity=u.player; loggedIn=true;
+  audit('login',role+'ログイン',identity);
+  identityBox.innerHTML=`<div class="authbox"><b>${esc(identity)}</b> としてログイン中<br><span class="muted">${role}モード</span><br><button class="btn" style="margin-top:10px" onclick="renderIdentity();identity='';loggedIn=false;renderHomeActions()">ログアウト</button></div>`;
+  renderHomeActions();
+}
+function loginCoach(){
+  const code=(coachCode.value||'').trim();
+  if(code!=='9999'){alert('指導者コードが違います');return}
+  loggedIn=true; identity='指導者';
+  audit('login','指導者ログイン','指導者');
+  identityBox.innerHTML=`<div class="authbox"><b>指導者</b>としてログイン中<br><button class="btn" style="margin-top:10px" onclick="renderIdentity();identity='';loggedIn=false;renderHomeActions()">ログアウト</button></div>`;
+  renderHomeActions();
+}
+function renderHomeActions(){
+  if((role==='保護者'||role==='選手')&&(!identity||!loggedIn)){
+    homeActions.innerHTML='<div class="notice" style="grid-column:1/-1">上の利用者設定からログインしてください。</div>'; return;
+  }
+  if(role==='指導者'&&!loggedIn){
+    homeActions.innerHTML='<div class="notice" style="grid-column:1/-1">上の利用者設定から指導者ログインしてください。</div>'; return;
+  }
+  const map={
+    'チーム':[
+      ['🙋','出席する',"showTab('attendance')"],
+      ['🎤','結果を話す',"showTab('voice')"],
+      ['😊','振り返る',"openReflection()"],
+      ['👤','選手を見る',"showTab('players')"]
+    ],
+    '指導者':[
+      ['🎤','結果を話す',"showTab('voice')"],
+      ['💡','気づきを残す',"openNotice('指導者')"],
+      ['🏆','大会結果',"startRecord('大会')"],
+      ['👤','選手カルテ',"showTab('players')"],
+      ['🛠','選手・保護者登録',"showTab('admin')"]
+    ],
+    '保護者':[
+      ['💡','わが子の記録',"openNotice('保護者')"],
+      ['😊','本人の振り返り',"openReflection()"],
+      ['🏆','大会結果',"startRecord('大会')"],
+      ['👤','成長を見る',"showTab('players')"]
+    ],
+    '選手':[
+      ['🙋','出席する',"showTab('attendance')"],
+      ['😊','振り返る',"openReflection()"],
+      ['👤','自分の記録',"showTab('players')"],
+      ['🎤','結果を話す',"showTab('voice')"]
+    ]
+  };
+  homeActions.innerHTML=map[role].map(x=>`<button class="bigbtn" onclick="${x[2]}">${x[0]}<br>${x[1]}</button>`).join('');
+}
+function showTab(id){
+  ['home','attendance','voice','notice','reflection','record','players','profile','feedback','admin','settings'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
+  ['navHome','navAttendance','navVoice','navPlayers','navFeedback','navAdmin','navSettings'].forEach(x=>document.getElementById(x).classList.remove('active'));
+  const map={home:'navHome',attendance:'navAttendance',voice:'navVoice',players:'navPlayers',profile:'navPlayers',feedback:'navFeedback',admin:'navAdmin',settings:'navSettings'};
+  if(map[id])document.getElementById(map[id]).classList.add('active');
+  if(id==='home')renderHome();
+  if(id==='attendance')renderAttendance();
+  if(id==='players')renderPlayers();
+  if(id==='voice')explainVoiceEnvironment();
+  if(id==='feedback')renderFeedback();
+  if(id==='admin')renderAdmin();
+  if(id==='settings'){cloudUrl.value=getCloudUrl();cloudStatus.innerHTML=getCloudUrl()?'<span class="syncdot on"></span>現在：クラウド接続先を設定済み':'<span class="syncdot"></span>現在：この端末内に保存';}
+  scrollTo(0,0);
+}
+function renderHome(){
+  todayLabel.textContent=jpToday();
+  renderIdentity();
+  const ps=presentNames();
+  homeAttendCount.textContent=ps.length+'人';
+  homePresent.innerHTML=ps.length?ps.map(n=>`<span class="tag" style="margin:3px">${esc(n)}</span>`).join(''):'まだ出席入力がありません。';
+  renderHomeActions();
+}
+function renderAttendance(){
+  const ps=presentNames();
+  attendanceGrid.innerHTML=db.players.map(p=>{
+    const on=ps.includes(p);
+    return `<button class="attend ${on?'present':''}" onclick="toggleAttendance('${jsEsc(p)}')">${on?'✅ ':'○ '}${esc(p)}<br><span class="state">${on?'出席しました':'ここをタップ'}</span></button>`
+  }).join('');
+  attendCount.textContent=ps.length+'人';
+}
+function toggleAttendance(p){
+  const d=today(); if(!db.attendance[d])db.attendance[d]=[];
+  const i=db.attendance[d].indexOf(p);
+  if(i>=0)db.attendance[d].splice(i,1); else db.attendance[d].push(p);
+  persist(); audit('attendance','出席更新',p); cloudSave('attendance',{date:d,players:db.attendance[d]}); renderAttendance(); renderHome();
+}
+function allowedPlayers(preferPresent=false){
+  if((role==='保護者'||role==='選手')&&identity)return [identity];
+  return (preferPresent&&presentNames().length)?presentNames():db.players;
+}
+function playerOptions(target,preferPresent=false){
+  const list=allowedPlayers(preferPresent);
+  target.innerHTML=list.map(p=>`<option>${esc(p)}</option>`).join('');
+}
+function openNotice(author='指導者'){
+  playerOptions(nPlayer,true); nAuthor.value=author; nText.value=''; nNext.value=''; showTab('notice');
+}
+function saveNotice(){
+  if(!nPlayer.value||!nText.value.trim()){alert('選手と気づきを入力してください');return}
+  db.notices.unshift({id:Date.now(),date:today(),player:nPlayer.value,author:nAuthor.value,kind:nKind.value,text:nText.value.trim(),next:nNext.value.trim()});
+  persist(); audit('notice','気づき保存',nPlayer.value); cloudSave('notice',db.notices[0]); alert('気づきを保存しました'); openProfile(nPlayer.value);
+}
+function openReflection(){
+  playerOptions(fPlayer,true); fGood.value=''; fNext.value=''; showTab('reflection');
+}
+function saveReflection(){
+  if(!fPlayer.value||!fGood.value.trim()){alert('選手と「できたこと」を入力してください');return}
+  db.reflections.unshift({id:Date.now(),date:today(),player:fPlayer.value,good:fGood.value.trim(),next:fNext.value.trim()});
+  persist(); audit('reflection','本人振り返り保存',fPlayer.value); cloudSave('reflection',db.reflections[0]); alert('振り返りを保存しました'); openProfile(fPlayer.value);
+}
+function startRecord(type){
+  recordType=type; playerOptions(rPlayer,true); rDate.value=today(); rResult.value=''; rName.value=''; rOpponent.value=''; rFor.value=''; rAgainst.value=''; rNote.value=''; rNext.value='';
+  recordTitle.textContent=type==='大会'?'🏆 大会結果を入力':'🎯 ゲーム練習を記録'; showTab('record');
+}
+function setResult(v){rResult.value=v}
+function addRecord(player,opponent,forG,againstG,result,type,date,name,note,next,event='シングルス'){
+  db.records.unshift({id:Date.now()+Math.random(),player,opponent,for:forG,against:againstG,result,type,date,name,note,next,event});
+}
+function saveRecord(){
+  if(!rPlayer.value||!rResult.value){alert('選手と勝敗を確認してください');return}
+  addRecord(rPlayer.value,rOpponent.value,Number(rFor.value||0),Number(rAgainst.value||0),rResult.value,recordType,rDate.value||today(),rName.value.trim(),rNote.value.trim(),rNext.value.trim(),rEvent.value);
+  persist(); audit('record','試合結果保存',rPlayer.value); cloudSave('record',db.records[0]); alert('記録しました'); openProfile(rPlayer.value);
+}
+function normalizeVoice(t){
+  return t.replace(/\s/g,'').replace(/[－ー−]/g,'-').replace(/たい/g,'対').replace(/ツー/g,'2').replace(/ゼロ/g,'0');
+}
+function parseVoice(text){
+  let t=normalizeVoice(text);
+  let m=t.match(/^(.+?)対(.+?)[、,]?([0-9]+)(?:対|-)([0-9]+)で(.+?)(?:勝ち|勝利)?$/);
+  if(!m)return null;
+  let [_,a,b,ga,gb,winner]=m; ga=Number(ga); gb=Number(gb);
+  const names=db.players.slice().sort((x,y)=>y.length-x.length);
+  const match=x=>names.find(n=>x.includes(n))||x.replace(/勝ち$|勝利$/,'');
+  a=match(a);b=match(b);winner=match(winner);
+  if(winner!==a&&winner!==b)winner=ga>gb?a:b;
+  return {a,b,ga,gb,winner};
+}
+function explainVoiceEnvironment(){
+  const proto=location.protocol;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const parts=[];
+  if(proto==='file:') parts.push('⚠️ ファイルを直接開いています。Web公開URLでの利用を推奨します。');
+  else if(proto==='https:') parts.push('✅ HTTPSで開いています。');
+  else parts.push('⚠️ '+proto+' で開いています。HTTPSを推奨します。');
+  parts.push(SR?'✅ このブラウザには音声認識APIがあります。':'❌ このブラウザでは音声認識APIが見つかりません。');
+  if(typeof voiceEnv!=='undefined')voiceEnv.innerHTML=parts.join('<br>');
+}
+async function startVoice(){
+  explainVoiceEnvironment();
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    voiceRaw.textContent='このブラウザでは音声認識が利用できません。下の文字入力を使ってください。';
+    voicePreview.textContent='文字入力モードを利用できます';
+    return;
+  }
+  if(location.protocol==='file:'){
+    voiceRaw.textContent='HTMLファイルを直接開いているため、マイクが制限される可能性があります。Web公開URLで試してください。';
+  }
+  try{
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      stream.getTracks().forEach(t=>t.stop());
+    }
+  }catch(e){
+    voiceRaw.textContent='マイクの使用が許可されていません。ブラウザ設定でマイクを許可するか、下の文字入力を使ってください。';
+    voicePreview.textContent='マイク許可が必要です';
+    return;
+  }
+
+  const rec=new SR();
+  rec.lang='ja-JP'; rec.interimResults=false; rec.maxAlternatives=3;
+  voiceBtn.textContent='🎙️ 聞いています…';
+  voiceRaw.textContent='話してください。「山下対中山、2対0で山下」';
+  let gotResult=false;
+
+  rec.onresult=e=>{
+    gotResult=true;
+    const texts=[];
+    for(let i=0;i<e.results[0].length;i++)texts.push(e.results[0][i].transcript);
+    const text=texts[0];
+    voiceRaw.textContent='認識：「'+text+'」';
+    pendingVoice=parseVoice(text);
+    if(!pendingVoice && texts.length>1){
+      for(const alt of texts.slice(1)){
+        const parsed=parseVoice(alt);
+        if(parsed){pendingVoice=parsed;voiceRaw.textContent='認識候補：「'+alt+'」';break;}
+      }
+    }
+    if(pendingVoice){
+      const v=pendingVoice;
+      voicePreview.textContent=`${v.a} 対 ${v.b}　${v.ga}-${v.gb}　→ ${v.winner} 勝利`;
+      voiceActions.classList.remove('hide');
+    }else{
+      voicePreview.textContent='結果の形を読み取れませんでした。下の文字入力で修正できます。';
+      voiceActions.classList.add('hide');
+      voiceManual.value=text;
+    }
+  };
+  rec.onerror=e=>{
+    const map={
+      'not-allowed':'マイクの使用が許可されていません。',
+      'service-not-allowed':'音声認識サービスの利用が許可されていません。',
+      'no-speech':'声を聞き取れませんでした。',
+      'audio-capture':'マイクを利用できません。',
+      'network':'音声認識サービスとの通信でエラーが発生しました。',
+      'aborted':'音声認識が中断されました。'
+    };
+    voiceRaw.textContent=(map[e.error]||('音声認識エラー：'+e.error))+' 下の文字入力も利用できます。';
+    voicePreview.textContent='文字入力モードを利用できます';
+  };
+  rec.onend=()=>{
+    voiceBtn.textContent='🎤 マイクを押して話す';
+    if(!gotResult && voicePreview.textContent==='結果待ち'){
+      voicePreview.textContent='音声を取得できませんでした。文字入力も利用できます';
+    }
+  };
+  try{rec.start()}catch(e){
+    voiceRaw.textContent='音声認識を開始できませんでした：'+e.message;
+    voicePreview.textContent='文字入力モードを利用できます';
+  }
+}
+function parseManualVoice(){
+  const text=(voiceManual.value||'').trim();
+  if(!text){alert('結果を入力してください');return}
+  voiceRaw.textContent='文字入力：「'+text+'」';
+  pendingVoice=parseVoice(text);
+  if(pendingVoice){
+    const v=pendingVoice;
+    voicePreview.textContent=`${v.a} 対 ${v.b}　${v.ga}-${v.gb}　→ ${v.winner} 勝利`;
+    voiceActions.classList.remove('hide');
+  }else{
+    voicePreview.textContent='「山下対中山、2対0で山下」のように入力してください。';
+    voiceActions.classList.add('hide');
+  }
+}
+function confirmVoiceResult(){
+  if(!pendingVoice)return; const v=pendingVoice, aWin=v.winner===v.a;
+  addRecord(v.a,v.b,v.ga,v.gb,aWin?'勝利':'敗戦','ゲーム練習',today(),'音声入力','','','シングルス');
+  addRecord(v.b,v.a,v.gb,v.ga,aWin?'敗戦':'勝利','ゲーム練習',today(),'音声入力','','','シングルス');
+  persist(); audit('record','音声試合結果保存',v.a+' / '+v.b); cloudSave('recordBatch',[db.records[1],db.records[0]]); alert('2人の記録に反映しました'); clearVoice(); showTab('home');
+}
+function clearVoice(){pendingVoice=null;voiceRaw.textContent='認識した言葉がここに表示されます。';voicePreview.textContent='結果待ち';voiceActions.classList.add('hide')}
+
+
+
+function saveFeedback(){
+  const text=(fbText.value||'').trim();
+  if(!text){alert('内容を入力してください');return}
+  if(!db.feedback)db.feedback=[];
+  const item={id:Date.now(),time:new Date().toISOString(),user:fbUser.value,text};
+  db.feedback.unshift(item);
+  persist(); cloudSave('feedback',item); audit('feedback','テストメモ保存',fbUser.value);
+  fbText.value=''; renderFeedback(); alert('テストメモを保存しました');
+}
+function renderFeedback(){
+  const list=db.feedback||[];
+  feedbackList.innerHTML=list.length?list.map(x=>`<div class="feedback"><b>${esc(x.user)}</b><br><span class="muted">${new Date(x.time).toLocaleString('ja-JP')}</span><p>${esc(x.text)}</p></div>`).join(''):'<p class="muted">まだテストメモはありません。</p>';
+}
+
+function bulkImportPlayers(){
+  if(role!=='指導者'||!loggedIn){alert('指導者ログインが必要です');return}
+  const names=(bulkNames.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(!names.length){alert('選手名を入力してください');return}
+  let added=0;
+  names.forEach(p=>{
+    if(db.players.includes(p))return;
+    db.players.push(p);
+    ensureUser('保護者',p); ensureUser('選手',p);
+    cloudSave('player',{name:p});
+    cloudSave('user',db.users.find(x=>x.role==='保護者'&&x.player===p));
+    cloudSave('user',db.users.find(x=>x.role==='選手'&&x.player===p));
+    added++;
+  });
+  persist(); audit('bulkImport','名簿一括登録',added+'名');
+  bulkNames.value=''; renderAdmin(); alert(added+'名を登録しました');
+}
+function getPublicUrl(){return localStorage.getItem('hokubu_kizuki_public_url')||''}
+function savePublicUrl(){
+  const u=(publicAppUrl.value||'').trim();
+  if(u)localStorage.setItem('hokubu_kizuki_public_url',u);
+  else localStorage.removeItem('hokubu_kizuki_public_url');
+  renderInvites(); alert('公開URLを保存しました');
+}
+function inviteUrl(code,roleName){
+  const base=getPublicUrl();
+  if(!base)return '';
+  const sep=base.includes('?')?'&':'?';
+  return base+sep+'role='+encodeURIComponent(roleName)+'&code='+encodeURIComponent(code);
+}
+function qrImageUrl(text){
+  if(!text)return '';
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+encodeURIComponent(text);
+}
+function renderInvites(){
+  if(role!=='指導者'||!loggedIn){inviteList.innerHTML='<p class="notice">指導者ログインが必要です。</p>';return}
+  publicAppUrl.value=getPublicUrl();
+  inviteList.innerHTML=db.players.map(p=>{
+    const u=ensureUser('保護者',p);
+    const url=inviteUrl(u.code,'保護者');
+    const qr=url?`<img src="${qrImageUrl(url)}" width="150" height="150" alt="QRコード">`:`<div class="qrbox">公開URLを設定すると<br>QRコードを表示します</div>`;
+    return `<div class="invite">
+      <h4>北部ジュニア きづき｜保護者用</h4>
+      <p><b>${esc(p)}</b> さんのご家庭へ</p>
+      <p>保護者コード</p><div class="codebig">${esc(u.code)}</div>
+      <p class="muted">このコードは、お子さんの記録を見るための個別コードです。他の家庭には共有しないでください。</p>
+      <div>${qr}</div>
+      ${url?`<p class="muted" style="word-break:break-all">${esc(url)}</p>`:''}
+    </div>`;
+  }).join('');
+}
+
+function randomCode(prefix){
+  let tries=0;
+  while(tries<100){
+    const code=prefix+String(Math.floor(Math.random()*900)+100);
+    if(!(db.users||[]).some(u=>u.code===code))return code;
+    tries++;
+  }
+  return prefix+String(Date.now()).slice(-3);
+}
+function ensureUser(role,player){
+  if(!db.users)db.users=[];
+  let u=db.users.find(x=>x.role===role&&x.player===player);
+  if(!u){
+    u={role,player,code:randomCode(role==='保護者'?'1':'2')};
+    db.users.push(u);
+  }
+  return u;
+}
+function adminAddPlayer(){
+  if(role!=='指導者'||!loggedIn){alert('指導者ログインが必要です');return}
+  const p=(aPlayerName.value||'').trim();
+  if(!p)return;
+  if(db.players.includes(p)){alert('同じ名前が登録されています');return}
+  db.players.push(p);
+  ensureUser('保護者',p); ensureUser('選手',p);
+  persist(); audit('player','選手追加',p); cloudSave('player',{name:p});
+  cloudSave('user',db.users.find(x=>x.role==='保護者'&&x.player===p));
+  cloudSave('user',db.users.find(x=>x.role==='選手'&&x.player===p));
+  aPlayerName.value=''; renderAdmin(); alert('選手とログインコードを登録しました');
+}
+function regenerateCode(player,roleName){
+  if(role!=='指導者'||!loggedIn){alert('指導者ログインが必要です');return}
+  const u=ensureUser(roleName,player);
+  u.code=randomCode(roleName==='保護者'?'1':'2');
+  persist(); cloudSave('user',u); renderAdmin();
+}
+function removePlayerAdmin(player){
+  if(role!=='指導者'||!loggedIn){alert('指導者ログインが必要です');return}
+  if(!confirm(player+' を選手一覧から外しますか？過去記録は残ります。'))return;
+  db.players=db.players.filter(p=>p!==player);
+  persist(); audit('player','選手一覧から除外',player); renderAdmin(); renderPlayers();
+}
+function renderAdmin(){
+  if(role!=='指導者'||!loggedIn){
+    adminList.innerHTML='<p class="notice">この画面は指導者専用です。ホームで「指導者」を選んでください。</p>'; return;
+  }
+  auditList.innerHTML=renderAudit();
+  if(typeof publicAppUrl!=='undefined')publicAppUrl.value=getPublicUrl();
+  renderInvites();
+  adminList.innerHTML=db.players.map(p=>{
+    const pu=ensureUser('保護者',p), su=ensureUser('選手',p);
+    return `<div class="item">
+      <div class="top"><b>${esc(p)}</b><span class="tag">登録中</span></div>
+      <p>保護者コード：<b>${esc(pu.code)}</b>　<button class="btn" onclick="regenerateCode('${jsEsc(p)}','保護者')">再発行</button></p>
+      <p>選手コード：<b>${esc(su.code)}</b>　<button class="btn" onclick="regenerateCode('${jsEsc(p)}','選手')">再発行</button></p>
+      <button class="btn bad" onclick="removePlayerAdmin('${jsEsc(p)}')">選手一覧から外す</button>
+    </div>`
+  }).join('');
+}
+
+function renderPlayers(){
+  const visible=((role==='保護者'||role==='選手')&&identity)?[identity]:db.players;
+  if((role==='保護者'||role==='選手')&&(!identity||!loggedIn)){
+    playerList.innerHTML='<p class="muted">ホームで選手を選んでください。</p>'; return;
+  }
+  playerList.innerHTML=visible.map(p=>{
+    const rs=db.records.filter(r=>r.player===p),ns=db.notices.filter(n=>n.player===p),fs=db.reflections.filter(f=>f.player===p);
+    return `<button class="player" onclick="openProfile('${jsEsc(p)}')">${esc(p)}<br><span class="muted">${rs.length}試合・${ns.length+fs.length}件のきづき</span></button>`
+  }).join('');
+}
+function addPlayer(){
+  const p=newPlayer.value.trim(); if(!p)return; if(db.players.includes(p)){alert('同じ名前があります');return}
+  db.players.push(p);persist();cloudSave('player',{name:p});newPlayer.value='';renderPlayers();
+}
+function openProfile(p){
+  const rs=db.records.filter(r=>r.player===p),ns=db.notices.filter(n=>n.player===p),fs=db.reflections.filter(f=>f.player===p);
+  const wins=rs.filter(r=>r.result==='勝利').length;
+  pName.textContent='👤 '+p+' の成長カルテ'; pMatches.textContent=rs.length;pWins.textContent=wins;pNotices.textContent=ns.length+fs.length;
+  const timeline=[
+    ...rs.map(r=>({date:r.date,html:`<div class="item"><div class="top"><b>${esc(r.date)} ${esc(r.name||r.type)}</b><span class="tag">${esc(r.type)}</span></div><p><span class="${r.result==='勝利'?'win':'loss'}">${esc(r.result)}</span>　vs ${esc(r.opponent||'未入力')}　${r.for}-${r.against}</p>${r.note?`<p>🌱 ${esc(r.note)}</p>`:''}${r.next?`<p>➡️ 次：${esc(r.next)}</p>`:''}${role==='指導者'&&loggedIn?`<div class="btnrow"><button class="btn" onclick="editRecord('${r.id}')">修正</button><button class="btn bad" onclick="deleteRecord('${r.id}')">削除</button></div>`:''}</div>`})),
+    ...ns.map(n=>({date:n.date,html:`<div class="item"><div class="top"><b>${esc(n.date)} 気づき</b><span class="tag">${esc(n.author)}・${esc(n.kind)}</span></div><p>💡 ${esc(n.text)}</p>${n.next?`<p>➡️ 次：${esc(n.next)}</p>`:''}</div>`})),
+    ...fs.map(f=>({date:f.date,html:`<div class="item"><div class="top"><b>${esc(f.date)} 本人の振り返り</b><span class="tag">本人</span></div><p>😊 できた：${esc(f.good)}</p>${f.next?`<p>➡️ 次：${esc(f.next)}</p>`:''}</div>`}))
+  ].sort((a,b)=>b.date.localeCompare(a.date));
+  pHistory.innerHTML=timeline.length?timeline.map(x=>x.html).join(''):'<p class="muted">まだ記録がありません。</p>';
+  showTab('profile');
+}
+
+function editRecord(id){
+  if(role!=='指導者'||!loggedIn){alert('指導者のみ修正できます');return}
+  const r=db.records.find(x=>String(x.id)===String(id)); if(!r)return;
+  const opp=prompt('対戦相手',r.opponent||''); if(opp===null)return;
+  const fg=prompt('自分のゲーム数',r.for); if(fg===null)return;
+  const ag=prompt('相手のゲーム数',r.against); if(ag===null)return;
+  const note=prompt('気づき',r.note||''); if(note===null)return;
+  r.opponent=opp.trim(); r.for=Number(fg||0); r.against=Number(ag||0); r.result=r.for>r.against?'勝利':'敗戦'; r.note=note.trim();
+  persist(); audit('edit','試合結果修正',r.player); cloudSave('recordEdit',r); openProfile(r.player);
+}
+function deleteRecord(id){
+  if(role!=='指導者'||!loggedIn){alert('指導者のみ削除できます');return}
+  const r=db.records.find(x=>String(x.id)===String(id)); if(!r)return;
+  if(!confirm('この試合記録を削除しますか？'))return;
+  db.records=db.records.filter(x=>String(x.id)!==String(id));
+  persist(); audit('delete','試合結果削除',r.player); cloudSave('recordDelete',{id:r.id}); openProfile(r.player);
+}
+function renderAudit(){
+  if(role!=='指導者'||!loggedIn)return '<p class="notice">指導者ログインが必要です。</p>';
+  const logs=(db.audit||[]).slice(0,50);
+  return logs.length?logs.map(a=>`<div class="audit">${new Date(a.time).toLocaleString('ja-JP')}｜${esc(a.actor)}｜${esc(a.detail)} ${a.target?'｜'+esc(a.target):''}</div>`).join(''):'<p class="muted">操作履歴はまだありません。</p>';
+}
+
+
+function exportTestReport(){
+  const lines=[];
+  lines.push('北部ジュニア きづき テスト運用レポート');
+  lines.push('作成日時: '+new Date().toLocaleString('ja-JP'));
+  lines.push('');
+  lines.push('選手数: '+db.players.length);
+  lines.push('試合記録: '+db.records.length+'件');
+  lines.push('気づき: '+db.notices.length+'件');
+  lines.push('振り返り: '+db.reflections.length+'件');
+  lines.push('テストメモ: '+((db.feedback||[]).length)+'件');
+  lines.push('');
+  lines.push('【テストメモ】');
+  (db.feedback||[]).forEach(x=>lines.push(new Date(x.time).toLocaleString('ja-JP')+'｜'+x.user+'｜'+x.text));
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='北部ジュニアきづき_テスト運用レポート.txt';a.click();URL.revokeObjectURL(a.href);
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='北部ジュニアきづき_v03.json';a.click();URL.revokeObjectURL(a.href);
+}
+function resetData(){if(confirm('試作データをすべて消しますか？')){db=seed();persist();showTab('home')}}
+
+function autoLoginFromUrl(){
+  const q=new URLSearchParams(location.search);
+  const r=q.get('role'), c=q.get('code');
+  if(!r||!c)return;
+  if(r==='保護者'||r==='選手'){
+    role=r;
+    document.querySelectorAll('.rolebar button').forEach(b=>b.classList.toggle('active',b.dataset.role===r));
+    const u=(db.users||[]).find(x=>x.role===r&&x.code===c);
+    if(u){identity=u.player;loggedIn=true;renderIdentity();identityBox.innerHTML=`<div class="authbox"><b>${esc(identity)}</b> としてログイン中<br><span class="muted">${role}モード</span></div>`;renderHomeActions();}
+  }
+}
+
+persist();renderHome();renderIdentity();autoLoginFromUrl();
+</script>
+</body>
+</html>
