@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>北部ジュニア きづき｜テスト運用版 v1.0.1</title>
+<meta name="theme-color" content="#2457d6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="北部きづき">
+<link rel="manifest" href="manifest.json">
+<title>北部ジュニア きづき｜テスト運用版 v1.0.3</title>
 <style>
 :root{
   --bg:#f6f8fc;--card:#fff;--ink:#172033;--muted:#667085;--line:#e4e7ec;
@@ -16,11 +21,11 @@ header{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);backdrop
 .brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}
 main{max-width:840px;margin:auto;padding:16px 14px 104px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 4px 16px rgba(16,24,40,.04)}
-.hero{background:linear-gradient(135deg,#eef4ff,#fff)}
+.hero{background:linear-gradient(135deg,#e8f3ff,#fff);border:2px solid #b8d4ff;padding:20px}
 h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:0 0 8px}p{line-height:1.6}.muted{color:var(--muted);font-size:14px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .bigbtn,.btn{border:0;border-radius:15px;padding:14px 12px;font-weight:800;font-size:16px;cursor:pointer}
-.bigbtn{background:var(--soft);color:#173d9a;min-height:86px}.btn{background:#eef1f6;color:var(--ink)}
+.bigbtn{background:#fff;color:#173d9a;min-height:112px;border:2px solid #c9d9ff;font-size:19px;box-shadow:0 5px 12px rgba(36,87,214,.09)}.btn{background:#eef1f6;color:var(--ink)}
 .btn.primary{background:var(--accent);color:#fff}.btn.good{background:#e9f7ef;color:var(--good)}.btn.bad{background:#feeceb;color:var(--bad)}
 .btn.orange{background:#fff3e8;color:var(--orange)}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.btnrow .btn{flex:1;min-width:120px}
 .rolebar{display:flex;gap:8px;overflow:auto;padding-bottom:2px}.rolebar button{white-space:nowrap}
@@ -30,6 +35,7 @@ input,select,textarea{width:100%;font:inherit;border:1px solid #cfd4dc;border-ra
 textarea{min-height:86px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hide{display:none!important}
 .playerList,.attendanceGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
 .player,.attend{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:left;font-weight:800}
+.gradeHeading{grid-column:1/-1;margin:12px 0 0;padding:9px 12px;border-radius:12px;background:#e8f3ff;color:#173d9a;font-size:16px}
 .attend.present{background:#e9f7ef;border-color:#7bc49b;color:#146c43}.attend .state{font-size:12px;font-weight:600;color:var(--muted)}
 .statline{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f8fafc;border-radius:14px;padding:12px;text-align:center}.stat b{display:block;font-size:22px}
 .item{border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0;background:#fff}
@@ -56,52 +62,61 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
 .testbanner{background:#ecfdf3;border:1px solid #abefc6;border-radius:16px;padding:12px 14px;margin-bottom:14px;color:#067647}
 .testbanner b{display:block;margin-bottom:3px}
 .feedback{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px}
+.connectionBar{max-width:840px;margin:8px auto 0;border-radius:10px;padding:7px 10px;text-align:center;font-size:12px;font-weight:800;background:#ecfdf3;color:#067647}.connectionBar.offline{background:#fff4e5;color:#9a4d00}.connectionBar.pending{background:#fff7d6;color:#7a5d00}
+.childLead{font-size:22px;font-weight:900;margin-bottom:4px}.adultArea{margin-top:28px;border-top:3px dashed #d0d5dd;padding-top:20px}.adultArea summary{cursor:pointer;font-size:17px;font-weight:800;padding:14px;background:#f2f4f7;border-radius:14px}.adultArea[open] summary{margin-bottom:12px}.modeNote{text-align:center;color:var(--muted);font-size:13px;margin:4px 0 12px}
+@media(max-width:560px){.hero{padding:16px}.bigbtn{min-height:104px;font-size:18px}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
     <h1>🏸 北部ジュニア きづき</h1>
-    <small>テスト運用版 v1.0.1</small>
+    <small>テスト運用版 v1.0.3</small>
   </div>
+  <div id="connectionBar" class="connectionBar">保存状態を確認しています</div>
 </header>
 
 <main>
-<div class="testbanner">
-  <b>🧪 北部ジュニア きづき｜テスト運用版 v1.0.1</b>
-  数名で実際に使い、出席・結果入力・気づき・保護者閲覧を確認します。v1.0.1では音声入力のエラー表示と文字入力フォールバックを改善しました。
-</div>
 <section id="home">
-  <div class="card">
-    <h3>使う人</h3>
-    <div class="rolebar">
-      <button class="btn active" data-role="チーム" onclick="setRole('チーム',this)">チームiPad</button>
-      <button class="btn" data-role="指導者" onclick="setRole('指導者',this)">指導者</button>
-      <button class="btn" data-role="保護者" onclick="setRole('保護者',this)">保護者</button>
-      <button class="btn" data-role="選手" onclick="setRole('選手',this)">選手</button>
-    </div>
-  </div>
-
-  <div class="card" id="accessCard">
-    <h3>🔐 利用者設定</h3>
-    <p class="muted">チームiPadは共用、指導者は全選手、保護者・選手は自分の登録情報だけを見る想定です。</p>
-    <div id="identityBox"></div>
-  </div>
-
   <div class="card hero">
-    <h2>今日の練習</h2>
+    <div class="childLead">🏸 きょうも がんばろう！</div>
     <p class="muted"><span id="todayLabel"></span>　参加 <span id="homeAttendCount" class="countBadge">0人</span></p>
+    <div id="todayPractice" class="notice" style="margin-bottom:12px">今日の予定を確認しています。</div>
+    <p class="modeNote">やりたいことを おしてね</p>
     <div class="grid" id="homeActions"></div>
   </div>
 
   <div class="card">
-    <h3>✅ 今日のテストで確認すること</h3>
-    <p class="muted">① 子どもが自分で出席できる　② 音声で結果を登録できる　③ 2人のカルテへ反映される　④ 指導者が気づきを残せる　⑤ 保護者が自分の子だけ見られる</p>
-  </div>
-  <div class="card">
-    <h3>今日参加している選手</h3>
+    <h3>🙌 きょう来ている なかま</h3>
     <div id="homePresent" class="muted">まだ出席入力がありません。</div>
   </div>
+
+  <details class="adultArea">
+    <summary>🔐 保護者・指導者はこちら</summary>
+    <div class="card">
+      <h3>画面を切り替える</h3>
+      <div class="rolebar">
+        <button class="btn active" data-role="チーム" onclick="setRole('チーム',this)">子ども用に戻す</button>
+        <button class="btn" data-role="保護者" onclick="setRole('保護者',this)">保護者</button>
+        <button class="btn" data-role="指導者" onclick="setRole('指導者',this)">指導者</button>
+        <button class="btn" data-role="選手" onclick="setRole('選手',this)">選手個人</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📲 アプリを家族へ送る</h3>
+      <p class="muted">下のボタンを押し、共有画面から「AirDrop」を選んでください。</p>
+      <button class="btn primary" style="width:100%" onclick="shareAppUrl()">AirDropでURLを送る</button>
+    </div>
+    <div class="card" id="accessCard">
+      <h3>🔐 利用者設定</h3>
+      <p class="muted">保護者・選手は自分の登録情報、指導者は全選手の情報を確認できます。</p>
+      <div id="identityBox"></div>
+    </div>
+    <div class="testbanner">
+      <b>🧪 テスト運用版 v1.0.3</b>
+      iPad標準の音声入力と、2026年8月の練習予定に対応しています。
+    </div>
+  </details>
 </section>
 
 <section id="attendance" class="hide">
@@ -115,9 +130,10 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
 
 <section id="voice" class="hide">
   <div class="card">
-    <h2>🎤 ゲーム結果を話す</h2>
-    <p class="muted">例：「山下 対 中山、2対0で山下」</p>
-    <button id="voiceBtn" class="btn orange" style="width:100%" onclick="startVoice()">🎤 マイクを押して話す</button>
+    <h2>🎤 ゲーム結果を入力</h2>
+    <p class="muted">入力欄をタップし、iPadキーボードの🎤で「山下 対 中山、2対0で山下」と話してください。</p>
+    <input id="voiceManual" placeholder="山下対中山、2対0で山下">
+    <button class="btn orange" style="width:100%;margin-top:8px" onclick="parseManualVoice()">結果を読み取る</button>
     <div class="voicebox">
       <div id="voiceEnv" class="muted"></div>
       <div id="voiceRaw" class="muted">認識した言葉がここに表示されます。</div>
@@ -127,13 +143,7 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
         <button class="btn" onclick="clearVoice()">やり直す</button>
       </div>
     </div>
-    <div class="card" style="margin:12px 0 0;padding:12px;background:#f8fafc">
-      <h3>⌨️ 音声が使えないとき</h3>
-      <p class="muted">同じ内容を文字で入力して「読み取る」を押せます。</p>
-      <input id="voiceManual" placeholder="山下対中山、2対0で山下">
-      <button class="btn" style="width:100%;margin-top:8px" onclick="parseManualVoice()">文字を読み取る</button>
-    </div>
-    <p class="notice">音声認識は、HTTPSで公開したWebページをSafari/Chromeから開くと安定しやすいです。ダウンロードしたHTMLを直接開いた場合は制限されることがあります。</p>
+    <p class="notice">キーボードに🎤がない場合は、同じ内容を文字で入力しても使えます。</p>
   </div>
 </section>
 
@@ -236,10 +246,10 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
   </div>
   <div class="card">
     <h3>📥 名簿をまとめて登録</h3>
-    <p class="muted">1行に1人ずつ入力します。例：山下 太郎</p>
-    <textarea id="bulkNames" class="bulkbox" placeholder="山下 太郎
-中山 花子
-田中 一郎"></textarea>
+    <p class="muted">実名は公開されず、このiPad内だけに保存されます。「学年,氏名」の形式で1行に1人ずつ入力してください。</p>
+    <textarea id="bulkNames" class="bulkbox" placeholder="小5,選手名
+小4,選手名
+中1,選手名"></textarea>
     <button class="btn primary" style="width:100%;margin-top:10px" onclick="bulkImportPlayers()">まとめて登録</button>
   </div>
   <div class="card">
@@ -275,6 +285,7 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
       <button class="btn" onclick="syncFromCloud()">クラウドから読み込む</button>
     </div>
     <p id="cloudStatus" class="muted"><span id="syncDot" class="syncdot"></span>現在：この端末内に保存</p>
+    <button class="btn primary" style="width:100%;margin-top:8px" onclick="flushSyncQueue()">未同期データを今すぐ送る</button>
     <button class="btn good" style="width:100%;margin-top:8px" onclick="fullSync()">今すぐ同期</button>
     <div class="item">① チームIDで北部ジュニアに接続</div>
     <div class="item">② 指導者＝全選手を閲覧・修正</div>
@@ -299,34 +310,72 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
 <button id="navAttendance" onclick="showTab('attendance')">🙋<br>出席</button>
 <button id="navVoice" onclick="showTab('voice')">🎤<br>結果</button>
 <button id="navPlayers" onclick="showTab('players')">👤<br>選手</button>
-<button id="navFeedback" onclick="showTab('feedback')">📝<br>メモ</button>
-<button id="navAdmin" onclick="showTab('admin')">🛠<br>登録</button>
-<button id="navSettings" onclick="showTab('settings')">⚙️<br>管理</button>
 </nav>
 
 <script>
-const KEY='hokubu_kizuki_v101';
+const KEY='hokubu_kizuki_v103';
+const SYNC_QUEUE_KEY='hokubu_kizuki_sync_queue_v103';
+const ROSTER=[];
+const PLAYER_GRADES={};
+const GRADE_ORDER=['中3','中2','中1','小6','小5','小4','小3','小2','小1','学年未設定'];
 let db=load(), role='チーム', identity='', pendingVoice=null, recordType='ゲーム練習', loggedIn=false;
+
+const practiceSchedule={
+  '2026-08-01':['10:00〜12:00','北部'],
+  '2026-08-02':['17:00〜19:00','植木中央'],
+  '2026-08-03':['18:00〜20:00','植木中央'],
+  '2026-08-06':['19:00〜21:00','植木中央'],
+  '2026-08-08':['時間要確認','植木中央'],
+  '2026-08-09':['10:00〜12:00','植木中央'],
+  '2026-08-17':['18:00〜20:00','植木中央'],
+  '2026-08-20':['19:00〜21:00','植木中央'],
+  '2026-08-22':['10:00〜12:00','植木中央'],
+  '2026-08-23':['17:00〜19:00','植木中央'],
+  '2026-08-24':['18:00〜19:00','植木中央'],
+  '2026-08-27':['18:00〜20:00','植木中央'],
+  '2026-08-31':['19:00〜21:00','植木中央']
+};
 
 function seed(){
   return {
-    players:['山下','中山','リサ','選手A','選手B'],
+    players:[],
+    grades:{},
     attendance:{},
     records:[],
     notices:[],
     reflections:[],
-    users:[
-      {role:'保護者',code:'1001',player:'山下'},
-      {role:'保護者',code:'1002',player:'中山'},
-      {role:'選手',code:'2001',player:'山下'},
-      {role:'選手',code:'2002',player:'中山'}
-    ],
+    users:[],
     audit:[],
     feedback:[]
   }
 }
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||seed()}catch(e){return seed()}}
+function load(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(KEY));
+    if(!saved)return seed();
+    saved.players=saved.players||[];
+    saved.grades=saved.grades||{};
+    saved.users=saved.users||[];
+    return saved;
+  }catch(e){return seed()}
+}
 function persist(){localStorage.setItem(KEY,JSON.stringify(db))}
+function getSyncQueue(){try{return JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY))||[]}catch(e){return []}}
+function saveSyncQueue(queue){localStorage.setItem(SYNC_QUEUE_KEY,JSON.stringify(queue));updateConnectionStatus()}
+function requestId(){return (crypto.randomUUID&&crypto.randomUUID())||`${Date.now()}-${Math.random().toString(36).slice(2)}`}
+function queueCloudAction(action,payload,id=requestId()){
+  const queue=getSyncQueue();
+  queue.push({id,action,payload,createdAt:new Date().toISOString()});
+  saveSyncQueue(queue);
+  return id;
+}
+function updateConnectionStatus(){
+  if(!connectionBar)return;
+  const pending=getSyncQueue().length;
+  if(!navigator.onLine){connectionBar.className='connectionBar offline';connectionBar.textContent=`📴 オフライン・端末に保存中${pending?`（未同期 ${pending}件）`:''}`;return}
+  if(pending){connectionBar.className='connectionBar pending';connectionBar.textContent=`☁️ 端末に保存済み・未同期 ${pending}件`;return}
+  connectionBar.className='connectionBar';connectionBar.textContent='✅ オンライン・端末に保存済み';
+}
 function getCloudUrl(){return localStorage.getItem('hokubu_kizuki_cloud_url')||''}
 function saveCloudUrl(){
   const url=(cloudUrl.value||'').trim();
@@ -335,17 +384,47 @@ function saveCloudUrl(){
   cloudStatus.textContent='現在：クラウド接続先を設定済み';
   alert('接続先を保存しました');
 }
+async function shareAppUrl(){
+  const safeUrl=location.origin+location.pathname;
+  const shareData={title:'北部ジュニア きづき',text:'北部ジュニア きづきのアプリです',url:safeUrl};
+  try{
+    if(navigator.share){await navigator.share(shareData);return}
+    await navigator.clipboard.writeText(safeUrl);
+    alert('URLをコピーしました。共有メニューからAirDropで送ってください。');
+  }catch(e){
+    if(e.name!=='AbortError')prompt('このURLをコピーして送ってください',safeUrl);
+  }
+}
 async function cloudPost(action,payload){
   const url=getCloudUrl(); if(!url)return {ok:false,localOnly:true};
+  const id=requestId();
+  if(!navigator.onLine){queueCloudAction(action,payload,id);return {ok:false,queued:true}}
   try{
-    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,payload,team:'北部ジュニア'})});
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,payload,team:'北部ジュニア',requestId:id})});
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
     const data=await res.json();
     if(cloudStatus){cloudStatus.innerHTML='<span id="syncDot" class="syncdot on"></span>最終クラウド通信：'+new Date().toLocaleTimeString('ja-JP');}
+    updateConnectionStatus();
     return data;
   }catch(e){
+    queueCloudAction(action,payload,id);
     console.warn(e); if(cloudStatus){cloudStatus.innerHTML='<span id="syncDot" class="syncdot err"></span>クラウド通信失敗：端末内には保存済み';}
-    return {ok:false,error:String(e)};
+    return {ok:false,queued:true,error:String(e)};
   }
+}
+async function flushSyncQueue(){
+  const url=getCloudUrl(), queue=getSyncQueue();
+  if(!url||!navigator.onLine||!queue.length){updateConnectionStatus();return}
+  const remaining=[];
+  for(let index=0;index<queue.length;index++){
+    const item=queue[index];
+    try{
+      const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:item.action,payload:item.payload,team:'北部ジュニア',requestId:item.id})});
+      if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    }catch(e){remaining.push(...queue.slice(index));break}
+  }
+  saveSyncQueue(remaining);
+  if(!remaining.length&&cloudStatus)cloudStatus.innerHTML='<span id="syncDot" class="syncdot on"></span>未同期データを送信しました：'+new Date().toLocaleTimeString('ja-JP');
 }
 async function syncFromCloud(){
   const url=getCloudUrl(); if(!url){alert('先にApps ScriptのURLを設定してください');return}
@@ -429,17 +508,19 @@ function renderHomeActions(){
   }
   const map={
     'チーム':[
-      ['🙋','出席する',"showTab('attendance')"],
-      ['🎤','結果を話す',"showTab('voice')"],
-      ['😊','振り返る',"openReflection()"],
-      ['👤','選手を見る',"showTab('players')"]
+      ['🙋','しゅっせき',"showTab('attendance')"],
+      ['🎤','けっかを入れる',"showTab('voice')"],
+      ['😊','ふりかえる',"openReflection()"],
+      ['👤','きろくを見る',"showTab('players')"]
     ],
     '指導者':[
       ['🎤','結果を話す',"showTab('voice')"],
       ['💡','気づきを残す',"openNotice('指導者')"],
       ['🏆','大会結果',"startRecord('大会')"],
       ['👤','選手カルテ',"showTab('players')"],
-      ['🛠','選手・保護者登録',"showTab('admin')"]
+      ['🛠','選手・保護者登録',"showTab('admin')"],
+      ['📝','テストメモ',"showTab('feedback')"],
+      ['⚙️','管理・同期',"showTab('settings')"]
     ],
     '保護者':[
       ['💡','わが子の記録',"openNotice('保護者')"],
@@ -458,9 +539,9 @@ function renderHomeActions(){
 }
 function showTab(id){
   ['home','attendance','voice','notice','reflection','record','players','profile','feedback','admin','settings'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
-  ['navHome','navAttendance','navVoice','navPlayers','navFeedback','navAdmin','navSettings'].forEach(x=>document.getElementById(x).classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(button=>button.classList.remove('active'));
   const map={home:'navHome',attendance:'navAttendance',voice:'navVoice',players:'navPlayers',profile:'navPlayers',feedback:'navFeedback',admin:'navAdmin',settings:'navSettings'};
-  if(map[id])document.getElementById(map[id]).classList.add('active');
+  if(map[id]&&document.getElementById(map[id]))document.getElementById(map[id]).classList.add('active');
   if(id==='home')renderHome();
   if(id==='attendance')renderAttendance();
   if(id==='players')renderPlayers();
@@ -472,6 +553,10 @@ function showTab(id){
 }
 function renderHome(){
   todayLabel.textContent=jpToday();
+  const practice=practiceSchedule[today()];
+  todayPractice.innerHTML=practice
+    ? `<b>🏸 今日の練習予定</b><br>${esc(practice[0])}　${esc(practice[1])}`
+    : '<b>📅 今日の練習予定</b><br>登録されている予定はありません。';
   renderIdentity();
   const ps=presentNames();
   homeAttendCount.textContent=ps.length+'人';
@@ -480,10 +565,10 @@ function renderHome(){
 }
 function renderAttendance(){
   const ps=presentNames();
-  attendanceGrid.innerHTML=db.players.map(p=>{
-    const on=ps.includes(p);
-    return `<button class="attend ${on?'present':''}" onclick="toggleAttendance('${jsEsc(p)}')">${on?'✅ ':'○ '}${esc(p)}<br><span class="state">${on?'出席しました':'ここをタップ'}</span></button>`
-  }).join('');
+  attendanceGrid.innerHTML=groupPlayers(db.players,p=>{
+      const on=ps.includes(p);
+      return `<button class="attend ${on?'present':''}" onclick="toggleAttendance('${jsEsc(p)}')">${on?'✅ ':'○ '}${esc(p)}<br><span class="state">${on?'出席しました':'ここをタップ'}</span></button>`;
+    });
   attendCount.textContent=ps.length+'人';
 }
 function toggleAttendance(p){
@@ -498,8 +583,18 @@ function allowedPlayers(preferPresent=false){
 }
 function playerOptions(target,preferPresent=false){
   const list=allowedPlayers(preferPresent);
-  target.innerHTML=list.map(p=>`<option>${esc(p)}</option>`).join('');
+  target.innerHTML=GRADE_ORDER.map(grade=>{
+    const names=list.filter(p=>playerGrade(p)===grade);
+    return names.length?`<optgroup label="${grade}">${names.map(p=>`<option>${esc(p)}</option>`).join('')}</optgroup>`:'';
+  }).join('');
 }
+function groupPlayers(players,renderPlayer){
+  return GRADE_ORDER.map(grade=>{
+    const names=players.filter(p=>playerGrade(p)===grade);
+    return names.length?`<h3 class="gradeHeading">${grade}（${names.length}人）</h3>${names.map(renderPlayer).join('')}`:'';
+  }).join('');
+}
+function playerGrade(player){return (db.grades&&db.grades[player])||PLAYER_GRADES[player]||'学年未設定'}
 function openNotice(author='指導者'){
   playerOptions(nPlayer,true); nAuthor.value=author; nText.value=''; nNext.value=''; showTab('notice');
 }
@@ -667,10 +762,16 @@ function renderFeedback(){
 
 function bulkImportPlayers(){
   if(role!=='指導者'||!loggedIn){alert('指導者ログインが必要です');return}
-  const names=(bulkNames.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  if(!names.length){alert('選手名を入力してください');return}
+  const entries=(bulkNames.value||'').split(/\r?\n/).map(line=>{
+    const parts=line.split(/[,、\t]/).map(x=>x.trim()).filter(Boolean);
+    return parts.length>1?{grade:parts[0],name:parts.slice(1).join(' ')}:{grade:'学年未設定',name:parts[0]||''};
+  }).filter(entry=>entry.name);
+  if(!entries.length){alert('選手名を入力してください');return}
+  if(!db.grades)db.grades={};
   let added=0;
-  names.forEach(p=>{
+  entries.forEach(entry=>{
+    const p=entry.name;
+    db.grades[p]=entry.grade;
     if(db.players.includes(p))return;
     db.players.push(p);
     ensureUser('保護者',p); ensureUser('選手',p);
@@ -782,10 +883,10 @@ function renderPlayers(){
   if((role==='保護者'||role==='選手')&&(!identity||!loggedIn)){
     playerList.innerHTML='<p class="muted">ホームで選手を選んでください。</p>'; return;
   }
-  playerList.innerHTML=visible.map(p=>{
+  playerList.innerHTML=groupPlayers(visible,p=>{
     const rs=db.records.filter(r=>r.player===p),ns=db.notices.filter(n=>n.player===p),fs=db.reflections.filter(f=>f.player===p);
     return `<button class="player" onclick="openProfile('${jsEsc(p)}')">${esc(p)}<br><span class="muted">${rs.length}試合・${ns.length+fs.length}件のきづき</span></button>`
-  }).join('');
+  });
 }
 function addPlayer(){
   const p=newPlayer.value.trim(); if(!p)return; if(db.players.includes(p)){alert('同じ名前があります');return}
@@ -863,7 +964,12 @@ function autoLoginFromUrl(){
   }
 }
 
-persist();renderHome();renderIdentity();autoLoginFromUrl();
+window.addEventListener('online',()=>{updateConnectionStatus();flushSyncQueue()});
+window.addEventListener('offline',updateConnectionStatus);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.warn));
+}
+persist();renderHome();renderIdentity();autoLoginFromUrl();updateConnectionStatus();flushSyncQueue();
 </script>
 </body>
 </html>

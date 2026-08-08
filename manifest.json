@@ -1,0 +1,12 @@
+{
+  "name": "北部ジュニア きづき",
+  "short_name": "北部きづき",
+  "description": "北部ジュニアの出席・試合結果・振り返り記録",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f8fc",
+  "theme_color": "#2457d6"
+}
