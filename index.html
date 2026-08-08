@@ -106,6 +106,8 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
       <h3>📲 アプリを家族へ送る</h3>
       <p class="muted">下のボタンを押し、共有画面から「AirDrop」を選んでください。</p>
       <button class="btn primary" style="width:100%" onclick="shareAppUrl()">AirDropでURLを送る</button>
+      <button class="btn good" style="width:100%;margin-top:10px" onclick="shareRosterToDevice()">名簿をiPadへAirDrop</button>
+      <p class="muted">名簿はGitHubへ保存されません。AirDropで受け取った端末内だけに取り込みます。</p>
     </div>
     <div class="card" id="accessCard">
       <h3>🔐 利用者設定</h3>
@@ -394,6 +396,34 @@ async function shareAppUrl(){
   }catch(e){
     if(e.name!=='AbortError')prompt('このURLをコピーして送ってください',safeUrl);
   }
+}
+async function shareRosterToDevice(){
+  if(!db.players.length){alert('この端末には送れる名簿がありません。名簿が入っているMac側の画面から操作してください。');return}
+  const payload={players:db.players,grades:db.grades||{}};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const url='https://takaoyunion233.github.io/hokubu-Kizuki/#roster='+encoded;
+  const shareData={title:'北部ジュニア 名簿移行',text:'北部ジュニアのiPadで開いてください',url};
+  try{
+    if(navigator.share){await navigator.share(shareData);return}
+    await navigator.clipboard.writeText(url);
+    alert('名簿移行用URLをコピーしました。AirDropでiPadへ送ってください。');
+  }catch(e){if(e.name!=='AbortError')alert('名簿を共有できませんでした。')}
+}
+function importRosterFromHash(){
+  if(!location.hash.startsWith('#roster='))return;
+  try{
+    const encoded=location.hash.slice(8);
+    const payload=JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    const players=Array.isArray(payload.players)?payload.players.filter(name=>typeof name==='string'&&name.trim()):[];
+    if(!players.length)throw new Error('名簿が空です');
+    if(confirm(`${players.length}名の名簿をこの端末内へ取り込みますか？`)){
+      db.players=[...new Set(players)];
+      db.grades=payload.grades&&typeof payload.grades==='object'?payload.grades:{};
+      persist();
+      alert('名簿をこの端末内へ取り込みました。');
+    }
+  }catch(e){alert('名簿を読み込めませんでした。')}
+  history.replaceState(null,document.title,location.pathname+location.search);
 }
 async function cloudPost(action,payload){
   const url=getCloudUrl(); if(!url)return {ok:false,localOnly:true};
@@ -969,7 +999,7 @@ window.addEventListener('offline',updateConnectionStatus);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.warn));
 }
-persist();renderHome();renderIdentity();autoLoginFromUrl();updateConnectionStatus();flushSyncQueue();
+persist();importRosterFromHash();renderHome();renderIdentity();autoLoginFromUrl();updateConnectionStatus();flushSyncQueue();
 </script>
 </body>
 </html>
