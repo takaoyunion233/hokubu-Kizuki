@@ -1,6 +1,6 @@
 {
-  "name": "北部ジュニア きづき",
-  "short_name": "北部きづき",
+  "name": "北部ジュニア きづき・テスト版",
+  "short_name": "きづきテスト",
   "description": "北部ジュニアの出席・試合結果・振り返り記録",
   "lang": "ja",
   "start_url": "./",
@@ -8,5 +8,5 @@
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f6f8fc",
-  "theme_color": "#2457d6"
+  "theme_color": "#b54708"
 }
