@@ -108,10 +108,9 @@ nav button{flex:1;border:0;background:transparent;border-radius:12px;padding:9px
       </div>
     </div>
     <div class="card">
-      <h3>📲 アプリを家族へ送る</h3>
-      <p class="muted">下のボタンを押し、共有画面から「AirDrop」を選んでください。</p>
-      <button class="btn primary" style="width:100%" onclick="shareAppUrl()">AirDropでURLを送る</button>
-      <button class="btn good" style="width:100%;margin-top:10px" onclick="shareRosterToDevice()">名簿をiPadへAirDrop</button>
+      <h3>📲 iPadへ名簿を移す</h3>
+      <p class="muted">下のボタンを押し、共有画面からiPadを選んでください。アプリのURLと名簿を一緒に送ります。</p>
+      <button class="btn primary" style="width:100%" onclick="shareRosterToDevice()">名簿とアプリをiPadへAirDrop</button>
       <p class="muted">名簿はGitHubへ保存されません。AirDropで受け取った端末内だけに取り込みます。</p>
     </div>
     <div class="card" id="accessCard">
@@ -390,17 +389,6 @@ function saveCloudUrl(){
   localStorage.setItem('hokubu_kizuki_cloud_url',url);
   cloudStatus.textContent='現在：クラウド接続先を設定済み';
   alert('接続先を保存しました');
-}
-async function shareAppUrl(){
-  const safeUrl=location.origin+location.pathname;
-  const shareData={title:'北部ジュニア きづき',text:'北部ジュニア きづきのアプリです',url:safeUrl};
-  try{
-    if(navigator.share){await navigator.share(shareData);return}
-    await navigator.clipboard.writeText(safeUrl);
-    alert('URLをコピーしました。共有メニューからAirDropで送ってください。');
-  }catch(e){
-    if(e.name!=='AbortError')prompt('このURLをコピーして送ってください',safeUrl);
-  }
 }
 async function shareRosterToDevice(){
   if(!db.players.length){alert('この端末には送れる名簿がありません。名簿が入っているMac側の画面から操作してください。');return}

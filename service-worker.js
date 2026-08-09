@@ -1,4 +1,4 @@
-const CACHE_NAME='hokubu-kizuki-offline-v4';
+const CACHE_NAME='hokubu-kizuki-offline-v5';
 const APP_SHELL=['./','./manifest.json'];
 
 self.addEventListener('install',event=>{
